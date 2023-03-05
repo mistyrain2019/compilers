@@ -10,11 +10,11 @@ class EpsilonNFA extends RegexMatcher:
 
 
   override def matches(content: String): Boolean =
-    doMatch(content, 0, this.start, mutable.Set())
+    doMatch(content, 0, this.start, mutable.HashSet())
 
   private def doMatch(content: String, ptr: Int, state: State, memo: mutable.Set[String]): Boolean =
 
-    def generateKey(): String = s"${state.id}#@%${ptr}"
+    def generateKey(): String = s"${state.id}#${ptr}"
 
     def checkVisited(): Boolean = memo.contains(generateKey())
 

@@ -13,7 +13,8 @@ class TestRegexMatching extends AnyFunSuite {
     val initTime = System.currentTimeMillis()
 
 //    testMatching()
-    testMatching2()
+//    testMatching2()
+    testMatchingByStandardLibrary()
 
     val endTime = System.currentTimeMillis()
     println(s"the duration is ${endTime - initTime} ms")
@@ -30,6 +31,13 @@ class TestRegexMatching extends AnyFunSuite {
   private def testMatching2(): Unit =
 
     val regex = RegexMatcher.compile("(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)*a?u+t*y*(r|sr*)?", EpsilonNFAStrategy)
+
+    println(regex.matches("weiuyrweuirhewuirhweiuhauuuuyyyyysrrrrr")) // true
+    println(regex.matches("abbbbbbbbesdfsssfesdfsffffsssssfghijku")) // true
+    println(regex.matches("abbbbbbbbesdfsssfesdfsffffsssssfghijkurb")) // false
+
+  private def testMatchingByStandardLibrary(): Unit =
+    val regex = "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)*a?u+t*y*(r|sr*)?".r
 
     println(regex.matches("weiuyrweuirhewuirhweiuhauuuuyyyyysrrrrr")) // true
     println(regex.matches("abbbbbbbbesdfsssfesdfsffffsssssfghijku")) // true
