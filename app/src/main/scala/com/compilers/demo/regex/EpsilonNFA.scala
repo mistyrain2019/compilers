@@ -28,11 +28,16 @@ class EpsilonNFA extends RegexMatcher:
     else
       setVisited()
 
+    // search Epsilon-transitions
     if state.transitions
       .filter(_.transitionCondition.acceptEpsilon)
       .exists(transition => doMatch(content, ptr, transition.targetState, memo)) then
       return true
 
+    if ptr == content.length then
+      return false
+    
+    // search non-Epsilon transitions
     if state.transitions
       .filter(_.transitionCondition.accept(content.charAt(ptr)))
       .exists(transition => doMatch(content, ptr + 1, transition.targetState, memo)) then
