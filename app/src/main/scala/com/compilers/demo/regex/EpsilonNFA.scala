@@ -8,43 +8,37 @@ class EpsilonNFA extends RegexMatcher:
   private var end: State = State()
   end.isFinal = true
 
-  private val memo: mutable.Set[String] = mutable.Set()
 
   override def matches(content: String): Boolean =
-    val res = doMatch(content, 0, this.start)
-    memo.clear()
-    res
+    doMatch(content, 0, this.start, mutable.Set())
 
-  private def doMatch(content: String, ptr: Int, state: State): Boolean =
+  private def doMatch(content: String, ptr: Int, state: State, memo: mutable.Set[String]): Boolean =
+
+    def generateKey(): String = s"${state.id}#@%${ptr}"
+
+    def checkVisited(): Boolean = memo.contains(generateKey())
+
+    def setVisited(): Unit = memo.add(generateKey())
+
     if ptr == content.length && state == this.end then
       return true
 
-    if checkVisited(state, ptr) then
+    if checkVisited() then
       return false
     else
-      setVisited(state, ptr)
+      setVisited()
 
     if state.transitions
       .filter(_.transitionCondition.acceptEpsilon)
-      .exists(transition => doMatch(content, ptr, transition.targetState)) then
+      .exists(transition => doMatch(content, ptr, transition.targetState, memo)) then
       return true
 
     if state.transitions
       .filter(_.transitionCondition.accept(content.charAt(ptr)))
-      .exists(transition => doMatch(content, ptr + 1, transition.targetState)) then
+      .exists(transition => doMatch(content, ptr + 1, transition.targetState, memo)) then
       return true
 
     false
-
-  private def generateKey(state: State, ptrIndex: Int): String =
-    s"${state.id}#@%${ptrIndex}"
-
-  private def checkVisited(state: State, ptr: Int): Boolean =
-    memo.contains(generateKey(state, ptr))
-
-  private def setVisited(state: State, ptr: Int): Unit =
-    memo.add(generateKey(state, ptr))
-
 
 object EpsilonNFA:
 
