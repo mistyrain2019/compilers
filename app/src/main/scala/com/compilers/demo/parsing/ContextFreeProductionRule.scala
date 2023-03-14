@@ -1,19 +1,21 @@
 package com.compilers.demo.parsing
 
+import com.compilers.demo.parsing.ContextFreeProductionRule.raiseError
+
 class ContextFreeProductionRule(lhs: String, rhs: List[String]):
 
   var leftHandSide: String = ""
   var rightHandSide: List[String] = List()
 
-  assert(GrammarUtil.isNonTerminal(lhs))
-  assert(rhs.count(str => GrammarUtil.isEpsilon(str)) <= 1)
+  if !GrammarUtil.isNonTerminal(lhs.trim) then
+    raiseError("LeftHandSide must be non-terminal in a Context-Free Production Rule!")
 
-  if rhs.isEmpty || (rhs.length == 1 && GrammarUtil.isEpsilon(rhs.head)) then
-    rightHandSide = List("")
+  leftHandSide = lhs.trim
+
+  rightHandSide = if rhs.exists(str => !GrammarUtil.isEpsilon(str)) then
+    rhs.filterNot(GrammarUtil.isEpsilon)
   else
-    rightHandSide = rhs
-
-  leftHandSide = lhs
+    List("")
 
 
   override def toString: String =
@@ -26,24 +28,34 @@ class ContextFreeProductionRule(lhs: String, rhs: List[String]):
     rightHandSide.length == 1 && rightHandSide.head.isEmpty
 
 object ContextFreeProductionRule:
+
   def apply(rule: String): ContextFreeProductionRule =
-    assert(rule.countSubStringOccurrences("->") == 1)
-    val split = rule.split("->")
 
-    assert(split.length == 1 || split.length == 2)
+    if rule.countSubStringOccurrences("->") != 1 then
+      raiseError("illegal production rule!")
 
-    val lhs = split.head.trim
-    assert(GrammarUtil.isNonTerminal(lhs))
+    if rule.indexOf("->") == 0 then
+      raiseError("leftHandSide could not be empty!")
 
-    val rhs: List[String] = if split.length == 1 then
-      List("")
-    else
-      val right = split(1).trim.split(" ").filter(_.nonEmpty)
-      if right.isEmpty then
-        List("")
-      else
-        right.toList
+    val splitRule = rule.split("->")
+
+    if splitRule.length != 1 && splitRule.length != 2 then
+      raiseError("illegal production rule!")
+
+    val lhs = splitRule.head.trim
+    if !GrammarUtil.isNonTerminal(lhs) then
+      raiseError("leftHandSide must be NonTerminal!")
+
+    var rhs: List[String] = List("")
+
+    if splitRule.length == 2 then
+      val right = splitRule(1).trim.split(" ").filter(_.nonEmpty).toList
+      if right.nonEmpty then
+        rhs = right
 
     new ContextFreeProductionRule(lhs, rhs)
 
+  def raiseError(msg: String = ""): Unit =
+    throw ContextFreeProductionRuleException(msg)
 
+  private class ContextFreeProductionRuleException(msg: String) extends RuntimeException(msg)
