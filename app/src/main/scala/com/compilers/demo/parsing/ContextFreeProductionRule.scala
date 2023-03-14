@@ -46,7 +46,7 @@ object ContextFreeProductionRule:
     if !GrammarUtil.isNonTerminal(lhs) then
       raiseError("leftHandSide must be NonTerminal!")
 
-    var rhs: List[String] = List("")
+    var rhs: List[String] = List("") // default value is epsilon rule
 
     if splitRule.length == 2 then
       val right = splitRule(1).trim.split(" ").filter(_.nonEmpty).toList
