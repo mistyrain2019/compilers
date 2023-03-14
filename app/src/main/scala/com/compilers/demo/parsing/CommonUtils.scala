@@ -11,5 +11,7 @@ object GrammarUtil:
   def isTerminal(str: String): Boolean =
     str != null && str.nonEmpty && !str.head.isUpper && !str.contains(" ")
 
-  def countSubStringOccurrences(str: String, subStr: String): Int =
+
+extension (str: String)
+  def countSubStringOccurrences(subStr: String): Int =
     str.sliding(subStr.length).count(win => win == subStr)

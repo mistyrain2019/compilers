@@ -5,7 +5,7 @@ import scala.collection.immutable
 class ContextFreeGrammar private():
 
   var startSymbol: String = ""
-  
+
   var symbols: immutable.Set[String] = immutable.Set()
 
   var nonTerminals: immutable.Set[String] = immutable.Set()

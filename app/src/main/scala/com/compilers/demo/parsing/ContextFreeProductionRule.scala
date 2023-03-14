@@ -20,14 +20,14 @@ class ContextFreeProductionRule(lhs: String, rhs: List[String]):
     if isEpsilonProduction then
       s"$leftHandSide -> ε"
     else
-      s"$leftHandSide -> " + rightHandSide.mkString(" ")
+      s"$leftHandSide -> ${rightHandSide.mkString(" ")}"
 
   def isEpsilonProduction: Boolean =
     rightHandSide.length == 1 && rightHandSide.head.isEmpty
 
 object ContextFreeProductionRule:
   def apply(rule: String): ContextFreeProductionRule =
-    assert(GrammarUtil.countSubStringOccurrences(rule, "->") == 1)
+    assert(rule.countSubStringOccurrences("->") == 1)
     val split = rule.split("->")
 
     assert(split.length == 1 || split.length == 2)
@@ -45,3 +45,5 @@ object ContextFreeProductionRule:
         right.toList
 
     new ContextFreeProductionRule(lhs, rhs)
+
+
