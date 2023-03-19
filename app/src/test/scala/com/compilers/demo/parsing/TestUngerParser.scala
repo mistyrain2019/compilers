@@ -7,12 +7,13 @@ import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class TestUngerParser extends AnyFunSuite {
 
-  test("testing generator") {
-    testSearchingNodeGenerator()
-  }
-
   test("testing parsing") {
-    testUngerParsingMethod()
+    val startTime = System.currentTimeMillis()
+    //    testSearchingNodeGenerator()
+    //    testUngerParsingMethod()
+    testUngerParsingMethod2()
+    val endTime = System.currentTimeMillis()
+    println(s"time used: ${endTime - startTime} ms")
   }
 
   private def testSearchingNodeGenerator(): Unit =
@@ -38,6 +39,22 @@ class TestUngerParser extends AnyFunSuite {
     val ungerParsingMethod = UngerParser(cfg)
 
     val symbols = List("1", "+", "2", "*", "3333")
+    val ast = ungerParsingMethod.parse(symbols)
+    println(ast)
+    assert(ast != ErrorASTNode)
+
+  private def testUngerParsingMethod2(): Unit =
+    val rule1 = ContextFreeProductionRule("Expr -> Expr + Term")
+    val rule2 = ContextFreeProductionRule("Expr -> Term")
+    val rule3 = ContextFreeProductionRule("Term -> Term * Factor")
+    val rule4 = ContextFreeProductionRule("Term -> Factor")
+    val rule5 = ContextFreeProductionRule("Factor -> ( Expr )")
+    val rule6 = ContextFreeProductionRule("Factor -> i")
+    val cfg = ContextFreeGrammar("Expr", List(rule1, rule2, rule3, rule4, rule5, rule6))
+
+    val ungerParsingMethod = UngerParser(cfg)
+
+    val symbols = List("(", "i", "+", "i", ")", "*", "(", "i", "*", "i", ")")
     val ast = ungerParsingMethod.parse(symbols)
     println(ast)
     assert(ast != ErrorASTNode)
