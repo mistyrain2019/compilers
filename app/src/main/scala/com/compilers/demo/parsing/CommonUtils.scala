@@ -15,3 +15,10 @@ object GrammarUtil:
 extension (str: String)
   def countSubStringOccurrences(subStr: String): Int =
     str.sliding(subStr.length).count(win => win == subStr)
+
+extension (strList: List[String])
+  def emptyOrElse(defaultList: List[String]): List[String] =
+    if strList.isEmpty then
+      defaultList
+    else
+      strList
