@@ -1,7 +1,6 @@
-package com.compilers.demo
+package com.compilers.demo.regex
 
-import com.compilers.demo.regex.RegexParser
-import com.compilers.demo.regex.EpsilonNFA
+import com.compilers.demo.regex.{EpsilonNFA, RegexParser}
 import org.junit.runner.RunWith
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.junit.JUnitRunner

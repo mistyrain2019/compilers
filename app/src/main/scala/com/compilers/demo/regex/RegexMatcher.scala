@@ -1,6 +1,6 @@
 package com.compilers.demo.regex
 
-import RegexCompileStrategy.{EpsilonNFAStrategy, NFAStrategy, DFAStrategy}
+import RegexMatcher.RegexCompileStrategy.{EpsilonNFAStrategy, NFAStrategy, DFAStrategy}
 
 
 trait RegexMatcher:
@@ -16,3 +16,6 @@ object RegexMatcher:
       case EpsilonNFAStrategy => EpsilonNFA.thompsonConstruction(ast)
       case NFAStrategy => throw new RuntimeException()
       case DFAStrategy => throw new RuntimeException()
+
+  enum RegexCompileStrategy:
+    case EpsilonNFAStrategy, NFAStrategy, DFAStrategy
