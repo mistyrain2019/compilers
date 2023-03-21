@@ -54,8 +54,12 @@ class TestUngerParser extends AnyFunSuite {
 
     val ungerParsingMethod = UngerParser(cfg)
 
+    val symbolStr = "( i * i ) * ( ( i * i ) + ( i + i ) )"
+
     val symbols = List("(", "i", "+", "i", ")", "*", "(", "i", "*", "i", ")")
-    val ast = ungerParsingMethod.parse(symbols)
+    var ast: CommonASTNode = ErrorASTNode
+//    ast = ungerParsingMethod.parse(symbolStr.split(" ").filterNot(_.isEmpty).toList)
+    ast = ungerParsingMethod.parse(symbols)
     println(ast)
     assert(ast != ErrorASTNode)
 }
