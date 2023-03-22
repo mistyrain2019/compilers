@@ -29,7 +29,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
     if cfg.terminals.contains(matchingLeftHandSide) then
       if symbols.size == 1 && symbols.head == matchingLeftHandSide then
-        return recordAndReturn(CommonASTNode(matchingLeftHandSide, List(), true))
+        return recordAndReturn(CommonASTNode(matchingLeftHandSide, List.empty, true))
       else
         return recordAndReturn(ErrorASTNode)
 
@@ -65,7 +65,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
     if pos == rightHandSide.size then
       return buffer.toList
 
-    var res: List[CommonASTNode] = List()
+    var res: List[CommonASTNode] = List.empty
     var succeed = false
 
     for node <- nodes if !succeed do
@@ -85,7 +85,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
   def generateSearchingNode(symbolsToPartition: List[String], count: Int): List[SearchingStateNode] =
     if count == 0 then
-      return List()
+      return List.empty
     else if count == 1 then
       return List(SearchingStateNode(mapEmptySymbolsToEpsilon(symbolsToPartition)))
 
@@ -100,7 +100,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
 
   case class SearchingStateNode(symbols: List[String]):
-    var children: List[SearchingStateNode] = List()
+    var children: List[SearchingStateNode] = List.empty
 
 
 object UngerParser:

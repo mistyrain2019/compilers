@@ -1,7 +1,7 @@
 package com.compilers.demo.parsing
 
 class CommonASTNode(val symbol: String,
-                    val children: List[CommonASTNode] = List(),
+                    val children: List[CommonASTNode] = List.empty,
                     val isTerminal: Boolean = false):
 
   override def clone(): CommonASTNode =
@@ -13,4 +13,4 @@ class CommonASTNode(val symbol: String,
 /**
  * indicating a parsing error
  */
-object ErrorASTNode extends CommonASTNode("$$$Error!", List(), true)
+object ErrorASTNode extends CommonASTNode("$$$Error!", List.empty, true)
