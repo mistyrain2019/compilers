@@ -10,8 +10,8 @@ class TestUngerParser extends AnyFunSuite {
   test("testing parsing") {
     val startTime = System.currentTimeMillis()
 //    testSearchingNodeGenerator()
-    testUngerParsingMethod()
-//    testUngerParsingMethod2()
+//    testUngerParsingMethod()
+    testUngerParsingMethod2()
     val endTime = System.currentTimeMillis()
     println(s"time used: ${endTime - startTime} ms")
   }
@@ -54,12 +54,12 @@ class TestUngerParser extends AnyFunSuite {
 
     val ungerParsingMethod = UngerParser(cfg)
 
-    val symbolStr = "( i * i ) * ( ( i * i ) + ( i + i ) )"
+    val symbolStr = "( i * i ) * ( ( i * i ) + ( i + i ) * ( i + ( i * i ) ) )"
 
     val symbols = List("(", "i", "+", "i", ")", "*", "(", "i", "*", "i", ")")
     var ast: CommonASTNode = ErrorASTNode
-//    ast = ungerParsingMethod.parse(symbolStr.split(" ").filterNot(_.isEmpty).toList)
-    ast = ungerParsingMethod.parse(symbols)
+    ast = ungerParsingMethod.parse(symbolStr.split(" ").filterNot(_.isEmpty).toList)
+//    ast = ungerParsingMethod.parse(symbols)
     println(ast)
     assert(ast != ErrorASTNode)
 }

@@ -5,8 +5,10 @@ class CommonASTNode(val symbol: String,
                     val isTerminal: Boolean = false):
 
   override def clone(): CommonASTNode =
-    new CommonASTNode(this.symbol, this.children.map(_.clone()), this.isTerminal)
-
+    if this != ErrorASTNode then
+      new CommonASTNode(this.symbol, this.children.map(_.clone()), this.isTerminal)
+    else
+      ErrorASTNode
 
 /**
  * indicating a parsing error

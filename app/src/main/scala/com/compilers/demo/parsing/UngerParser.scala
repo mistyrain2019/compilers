@@ -9,66 +9,71 @@ import scala.collection.mutable.ListBuffer
 
 class UngerParser(val cfg: ContextFreeGrammar):
 
+  private val matchInProcessPatterns: mutable.Set[String] = mutable.HashSet()
+
   def parse(inputSymbolStream: List[String]): CommonASTNode =
-    doMatch(cfg.startSymbol, inputSymbolStream, mutable.HashMap(), mutable.Set())
+    doMatch(cfg.startSymbol, inputSymbolStream, mutable.HashMap())
 
   private def doMatch(matchingLeftHandSide: String,
                       symbols: List[String],
-                      memo: mutable.Map[String, CommonASTNode],
-                      matchInProcessPatterns: mutable.Set[String]): CommonASTNode =
+                      memo: mutable.Map[String, CommonASTNode]): CommonASTNode =
 
     val key = s"$matchingLeftHandSide@${symbols.mkString("#")}"
 
-    if memo.contains(key) then
+    if memo.contains(key) then // find same pattern in the memo
       return memo(key).clone()
 
-    else if cfg.terminals.contains(matchingLeftHandSide) then
-      if symbols.size == 1 && symbols.head == matchingLeftHandSide then
-        memo(key) = CommonASTNode(matchingLeftHandSide)
-        return memo(key)
-      else
-        return ErrorASTNode
+    inline def recordAndReturn(astNode: CommonASTNode): CommonASTNode =
+      memo(key) = astNode
+      astNode
 
-    if matchInProcessPatterns.contains(key) then // cut off searching patterns
+    if cfg.terminals.contains(matchingLeftHandSide) then
+      if symbols.size == 1 && symbols.head == matchingLeftHandSide then
+        return recordAndReturn(CommonASTNode(matchingLeftHandSide, List(), true))
+      else
+        return recordAndReturn(ErrorASTNode)
+
+    if matchInProcessPatterns.contains(key) then // cut off now-searching patterns
       return ErrorASTNode
 
     matchInProcessPatterns.add(key)
 
     val suitedRules = cfg.rules.filter(_.leftHandSide == matchingLeftHandSide)
 
+    var ifSucceed = false
+    var resAstNode: CommonASTNode = ErrorASTNode
 
-    def doSearchList(nodes: List[SearchingStateNode],
-                     rightHandSide: List[String],
-                     pos: Int,
-                     buffer: ListBuffer[CommonASTNode]
-                    ): List[CommonASTNode] =
+    for rule <- suitedRules if !ifSucceed do
+      val partitionedList = generateSearchingNode(symbols, rule.rightHandSide.size)
 
-      if pos == rightHandSide.size then
-        return buffer.toList
-      for node <- nodes do
-        val aSTNode = doMatch(rightHandSide(pos), node.symbols, memo, matchInProcessPatterns)
-        if aSTNode != ErrorASTNode then
-          buffer.addOne(aSTNode)
-          val res = doSearchList(node.children, rightHandSide, pos + 1, buffer)
-          if res.size == rightHandSide.size then
-            return res
-          buffer.remove(buffer.size - 1)
-      List()
+      val searchedAstNodes = doSearchList(partitionedList, rule.rightHandSide, 0, ListBuffer(), memo)
 
-
-    for rule <- suitedRules do
-      val rightHandSymbolsCount = rule.rightHandSide.size
-      val partitionedList = generateSearchingNode(symbols, rightHandSymbolsCount)
-      val searchedAstNodes = doSearchList(partitionedList, rule.rightHandSide, 0, ListBuffer())
-      if searchedAstNodes.size == rightHandSymbolsCount then
-        val successNode = CommonASTNode(matchingLeftHandSide, searchedAstNodes)
-        memo(key) = successNode
-
-        matchInProcessPatterns.remove(key)
-        return successNode
+      if searchedAstNodes.size == rule.rightHandSide.size then
+        resAstNode = CommonASTNode(matchingLeftHandSide, searchedAstNodes)
+        ifSucceed = true
 
     matchInProcessPatterns.remove(key)
-    ErrorASTNode
+    recordAndReturn(resAstNode)
+
+  private def doSearchList(nodes: List[SearchingStateNode],
+                           rightHandSide: List[String],
+                           pos: Int,
+                           buffer: ListBuffer[CommonASTNode],
+                           memo: mutable.Map[String, CommonASTNode],
+                          ): List[CommonASTNode] =
+
+    if pos == rightHandSide.size then
+      return buffer.toList
+    for node <- nodes do
+      val astNode = doMatch(rightHandSide(pos), node.symbols, memo)
+      if astNode != ErrorASTNode then
+        buffer.addOne(astNode)
+        val res = doSearchList(node.children, rightHandSide, pos + 1, buffer, memo)
+        if res.size == rightHandSide.size then
+          return res
+        buffer.remove(buffer.size - 1)
+
+    List()
 
 
   def generateSearchingNode(symbolsToPartition: List[String], count: Int): List[SearchingStateNode] =
@@ -97,6 +102,4 @@ object UngerParser:
 
   def mapEmptySymbolsToEpsilon(symbols: List[String]): List[String] =
     if symbols.isEmpty then EPSILON_SYMBOL_LIST else symbols
-
-
 
