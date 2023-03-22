@@ -9,9 +9,9 @@ class TestUngerParser extends AnyFunSuite {
 
   test("testing parsing") {
     val startTime = System.currentTimeMillis()
-    //    testSearchingNodeGenerator()
-    //    testUngerParsingMethod()
-    testUngerParsingMethod2()
+//    testSearchingNodeGenerator()
+    testUngerParsingMethod()
+//    testUngerParsingMethod2()
     val endTime = System.currentTimeMillis()
     println(s"time used: ${endTime - startTime} ms")
   }

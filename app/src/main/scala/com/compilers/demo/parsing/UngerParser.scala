@@ -1,6 +1,9 @@
 package com.compilers.demo.parsing
 
 
+import com.compilers.demo.parsing.UngerParser.EPSILON_SYMBOL_LIST
+import com.compilers.demo.parsing.UngerParser.mapEmptySymbolsToEpsilon
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -15,6 +18,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
                       matchInProcessPatterns: mutable.Set[String]): CommonASTNode =
 
     val key = s"$matchingLeftHandSide@${symbols.mkString("#")}"
+
     if memo.contains(key) then
       return memo(key).clone()
 
@@ -32,7 +36,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
     val suitedRules = cfg.rules.filter(_.leftHandSide == matchingLeftHandSide)
 
-    
+
     def doSearchList(nodes: List[SearchingStateNode],
                      rightHandSide: List[String],
                      pos: Int,
@@ -51,7 +55,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
           buffer.remove(buffer.size - 1)
       List()
 
-    
+
     for rule <- suitedRules do
       val rightHandSymbolsCount = rule.rightHandSide.size
       val partitionedList = generateSearchingNode(symbols, rightHandSymbolsCount)
@@ -59,7 +63,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
       if searchedAstNodes.size == rightHandSymbolsCount then
         val successNode = CommonASTNode(matchingLeftHandSide, searchedAstNodes)
         memo(key) = successNode
-        
+
         matchInProcessPatterns.remove(key)
         return successNode
 
@@ -71,22 +75,28 @@ class UngerParser(val cfg: ContextFreeGrammar):
     if count == 0 then
       return List()
     else if count == 1 then
-      return List(SearchingStateNode(symbolsToPartition.emptyOrElse(List(""))))
+      return List(SearchingStateNode(mapEmptySymbolsToEpsilon(symbolsToPartition)))
 
     val buffer = ListBuffer[SearchingStateNode]()
-    val node0 = SearchingStateNode(List(""))
-    node0.children = generateSearchingNode(symbolsToPartition, count - 1)
-    buffer.addOne(node0)
 
-    for i <- symbolsToPartition.indices do
-      val node = SearchingStateNode(symbolsToPartition.slice(0, i + 1))
-      node.children = generateSearchingNode(symbolsToPartition.slice(i + 1, symbolsToPartition.size), count - 1)
+    for i <- 0 to symbolsToPartition.size do
+      val node = SearchingStateNode(mapEmptySymbolsToEpsilon(symbolsToPartition.slice(0, i))) // leftmost part of a partition
+      node.children = generateSearchingNode(symbolsToPartition.slice(i, symbolsToPartition.size), count - 1) // use recursive to deal with the right
       buffer.addOne(node)
 
     buffer.toList
 
 
-  case class SearchingStateNode(symbols: List[String] = List()):
+  case class SearchingStateNode(symbols: List[String]):
     var children: List[SearchingStateNode] = List()
+
+
+object UngerParser:
+
+  val EPSILON_SYMBOL_LIST: List[String] = List("")
+
+  def mapEmptySymbolsToEpsilon(symbols: List[String]): List[String] =
+    if symbols.isEmpty then EPSILON_SYMBOL_LIST else symbols
+
 
 
