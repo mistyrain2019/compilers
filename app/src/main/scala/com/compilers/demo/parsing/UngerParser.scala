@@ -64,16 +64,23 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
     if pos == rightHandSide.size then
       return buffer.toList
-    for node <- nodes do
-      val astNode = doMatch(rightHandSide(pos), node.symbols, memo)
-      if astNode != ErrorASTNode then
-        buffer.addOne(astNode)
-        val res = doSearchList(node.children, rightHandSide, pos + 1, buffer, memo)
-        if res.size == rightHandSide.size then
-          return res
+
+    var res: List[CommonASTNode] = List()
+    var succeed = false
+
+    for node <- nodes if !succeed do
+      val astNodeAtPos = doMatch(rightHandSide(pos), node.symbols, memo)
+      if astNodeAtPos != ErrorASTNode then // one matched
+        buffer.addOne(astNodeAtPos)
+
+        val astNodesList = doSearchList(node.children, rightHandSide, pos + 1, buffer, memo) // recursive searching (pos + 1)
+        if astNodesList.size == rightHandSide.size then
+          succeed = true
+          res = astNodesList
+
         buffer.remove(buffer.size - 1)
 
-    List()
+    res
 
 
   def generateSearchingNode(symbolsToPartition: List[String], count: Int): List[SearchingStateNode] =
