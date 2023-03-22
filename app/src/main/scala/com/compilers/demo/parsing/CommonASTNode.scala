@@ -10,6 +10,12 @@ class CommonASTNode(val symbol: String,
     else
       ErrorASTNode
 
+  def getTerminalString: String =
+    if !isTerminal then
+      children.map(_.getTerminalString).mkString
+    else
+      symbol
+
 /**
  * indicating a parsing error
  */

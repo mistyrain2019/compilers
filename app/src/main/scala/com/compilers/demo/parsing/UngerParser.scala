@@ -46,7 +46,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
     for rule <- suitedRules if !ifSucceed do
       val searchedAstNodes = searchRightHandSide(symbols, rule, 0, mutable.ListBuffer(), memo) // match Rhs
-      
+
       if searchedAstNodes.size == rule.rightHandSide.size then // successfully matched
         resAstNode = CommonASTNode(symbol = matchingLeftHandSide, children = searchedAstNodes, isTerminal = false)
         ifSucceed = true
@@ -61,10 +61,11 @@ class UngerParser(val cfg: ContextFreeGrammar):
                                   memo: mutable.Map[String, CommonASTNode]
                                  ): List[CommonASTNode] =
 
-    if posOfRightHandSide == rule.rightHandSide.size then
-      return buffer.toList
-
-    val rightHandSideOfRule: List[String] = rule.rightHandSide
+    if posOfRightHandSide == rule.rightHandSide.size then // all Rhs matches
+      return if symbols.isEmpty || (symbols.size == 1 && GrammarUtil.isEpsilon(symbols.head)) then // check whether there is symbols left
+        buffer.toList
+      else
+        Nil
 
     var res: List[CommonASTNode] = Nil
 
@@ -72,17 +73,17 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
       val leftMostOfRhs = mapEmptySymbolsToEpsilon(symbols.slice(0, i)) // leftmost part, now searching
 
-      val leftMostAstNode = doMatch(rightHandSideOfRule(posOfRightHandSide), leftMostOfRhs, memo) // check if it matches with the pos of Rhs
+      val leftMostAstNode = doMatch(rule.rightHandSide(posOfRightHandSide), leftMostOfRhs, memo) // check if it matches with the pos of Rhs
 
       if leftMostAstNode != ErrorASTNode then // leftmost part matched at pos
 
-        val leftPartOfRhs: List[String] = mapEmptySymbolsToEpsilon(symbols.slice(i, symbols.size)) // left part
+        val restPartOfRhs: List[String] = mapEmptySymbolsToEpsilon(symbols.slice(i, symbols.size)) // left part
 
         buffer.addOne(leftMostAstNode)
 
-        val astList = searchRightHandSide(leftPartOfRhs, rule, posOfRightHandSide + 1, buffer, memo) // recursively dealing with next pos
+        val astList = searchRightHandSide(restPartOfRhs, rule, posOfRightHandSide + 1, buffer, memo) // recursively dealing with next pos
 
-        if astList.size == rightHandSideOfRule.size then // since we only add non-Error node to the buffer, the same size means matching successfully
+        if astList.size == rule.rightHandSide.size then // since we only add non-Error node to the buffer, the same size means matching successfully
           res = astList
 
         buffer.remove(buffer.size - 1)
@@ -92,10 +93,13 @@ class UngerParser(val cfg: ContextFreeGrammar):
 object UngerParser:
 
   case class SearchingStateNode(symbols: List[String]):
-    var children: List[SearchingStateNode] = List.empty
+    var children: List[SearchingStateNode] = Nil
 
   val EPSILON_SYMBOL_LIST: List[String] = List("")
 
   def mapEmptySymbolsToEpsilon(symbols: List[String]): List[String] =
-    if symbols.isEmpty then EPSILON_SYMBOL_LIST else symbols
+    if symbols.isEmpty then
+      EPSILON_SYMBOL_LIST
+    else
+      symbols
 

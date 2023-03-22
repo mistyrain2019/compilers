@@ -9,8 +9,8 @@ class TestUngerParser extends AnyFunSuite {
 
   test("testing parsing") {
     val startTime = System.currentTimeMillis()
-    testUngerParsingMethod()
-//    testUngerParsingMethod2()
+//    testUngerParsingMethod()
+    testUngerParsingMethod2()
     val endTime = System.currentTimeMillis()
     println(s"time used: ${endTime - startTime} ms")
   }
@@ -30,6 +30,7 @@ class TestUngerParser extends AnyFunSuite {
     val symbols = List("1", "+", "2", "*", "3333")
     val ast = ungerParsingMethod.parse(symbols)
     println(ast)
+    println(ast.getTerminalString)
     assert(ast != ErrorASTNode)
 
   private def testUngerParsingMethod2(): Unit =
@@ -50,5 +51,6 @@ class TestUngerParser extends AnyFunSuite {
     ast = ungerParsingMethod.parse(symbolStr.split(" ").filterNot(_.isEmpty).toList)
 //    ast = ungerParsingMethod.parse(symbols)
     println(ast)
+    println(ast.getTerminalString)
     assert(ast != ErrorASTNode)
 }
