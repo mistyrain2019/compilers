@@ -3,6 +3,7 @@ package com.compilers.demo.parsing
 
 import com.compilers.demo.parsing.UngerParser.EPSILON_SYMBOL_LIST
 import com.compilers.demo.parsing.UngerParser.mapEmptySymbolsToEpsilon
+import com.compilers.demo.parsing.UngerParser.SearchingStateNode
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -99,11 +100,10 @@ class UngerParser(val cfg: ContextFreeGrammar):
     buffer.toList
 
 
+object UngerParser:
+
   case class SearchingStateNode(symbols: List[String]):
     var children: List[SearchingStateNode] = List.empty
-
-
-object UngerParser:
 
   val EPSILON_SYMBOL_LIST: List[String] = List("")
 
