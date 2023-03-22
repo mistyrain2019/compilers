@@ -30,7 +30,7 @@ class UngerParser(val cfg: ContextFreeGrammar):
 
     if cfg.terminals.contains(matchingLeftHandSide) then
       if symbols.size == 1 && symbols.head == matchingLeftHandSide then
-        return recordAndReturn(CommonASTNode(matchingLeftHandSide, List.empty, true))
+        return recordAndReturn(CommonASTNode(matchingLeftHandSide, Nil, true))
       else
         return recordAndReturn(ErrorASTNode)
 
@@ -45,59 +45,48 @@ class UngerParser(val cfg: ContextFreeGrammar):
     var resAstNode: CommonASTNode = ErrorASTNode
 
     for rule <- suitedRules if !ifSucceed do
-      val partitionedList = generateSearchingNode(symbols, rule.rightHandSide.size)
-
-      val searchedAstNodes = doSearchList(partitionedList, rule.rightHandSide, 0, ListBuffer(), memo)
-
-      if searchedAstNodes.size == rule.rightHandSide.size then
-        resAstNode = CommonASTNode(matchingLeftHandSide, searchedAstNodes)
+      val searchedAstNodes = searchRightHandSide(symbols, rule, 0, mutable.ListBuffer(), memo) // match Rhs
+      
+      if searchedAstNodes.size == rule.rightHandSide.size then // successfully matched
+        resAstNode = CommonASTNode(symbol = matchingLeftHandSide, children = searchedAstNodes, isTerminal = false)
         ifSucceed = true
 
     matchInProcessPatterns.remove(key)
     recordAndReturn(resAstNode)
 
-  private def doSearchList(nodes: List[SearchingStateNode],
-                           rightHandSide: List[String],
-                           pos: Int,
-                           buffer: ListBuffer[CommonASTNode],
-                           memo: mutable.Map[String, CommonASTNode],
-                          ): List[CommonASTNode] =
+  private def searchRightHandSide(symbols: List[String],
+                                  rule: ContextFreeProductionRule,
+                                  posOfRightHandSide: Int,
+                                  buffer: ListBuffer[CommonASTNode],
+                                  memo: mutable.Map[String, CommonASTNode]
+                                 ): List[CommonASTNode] =
 
-    if pos == rightHandSide.size then
+    if posOfRightHandSide == rule.rightHandSide.size then
       return buffer.toList
 
-    var res: List[CommonASTNode] = List.empty
-    var succeed = false
+    val rightHandSideOfRule: List[String] = rule.rightHandSide
 
-    for node <- nodes if !succeed do
-      val astNodeAtPos = doMatch(rightHandSide(pos), node.symbols, memo)
-      if astNodeAtPos != ErrorASTNode then // one matched
-        buffer.addOne(astNodeAtPos)
+    var res: List[CommonASTNode] = Nil
 
-        val astNodesList = doSearchList(node.children, rightHandSide, pos + 1, buffer, memo) // recursive searching (pos + 1)
-        if astNodesList.size == rightHandSide.size then
-          succeed = true
-          res = astNodesList
+    for i <- 0 to symbols.size if res == Nil do // search every partition
+
+      val leftMostOfRhs = mapEmptySymbolsToEpsilon(symbols.slice(0, i)) // leftmost part, now searching
+
+      val leftMostAstNode = doMatch(rightHandSideOfRule(posOfRightHandSide), leftMostOfRhs, memo) // check if it matches with the pos of Rhs
+
+      if leftMostAstNode != ErrorASTNode then // leftmost part matched at pos
+
+        val leftPartOfRhs: List[String] = mapEmptySymbolsToEpsilon(symbols.slice(i, symbols.size)) // left part
+
+        buffer.addOne(leftMostAstNode)
+
+        val astList = searchRightHandSide(leftPartOfRhs, rule, posOfRightHandSide + 1, buffer, memo) // recursively dealing with next pos
+
+        if astList.size == rightHandSideOfRule.size then // since we only add non-Error node to the buffer, the same size means matching successfully
+          res = astList
 
         buffer.remove(buffer.size - 1)
-
     res
-
-
-  def generateSearchingNode(symbolsToPartition: List[String], count: Int): List[SearchingStateNode] =
-    if count == 0 then
-      return List.empty
-    else if count == 1 then
-      return List(SearchingStateNode(mapEmptySymbolsToEpsilon(symbolsToPartition)))
-
-    val buffer = ListBuffer[SearchingStateNode]()
-
-    for i <- 0 to symbolsToPartition.size do
-      val node = SearchingStateNode(mapEmptySymbolsToEpsilon(symbolsToPartition.slice(0, i))) // leftmost part of a partition
-      node.children = generateSearchingNode(symbolsToPartition.slice(i, symbolsToPartition.size), count - 1) // use recursive to deal with the right
-      buffer.addOne(node)
-
-    buffer.toList
 
 
 object UngerParser:

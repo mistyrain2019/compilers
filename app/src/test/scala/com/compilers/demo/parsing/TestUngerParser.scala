@@ -9,22 +9,11 @@ class TestUngerParser extends AnyFunSuite {
 
   test("testing parsing") {
     val startTime = System.currentTimeMillis()
-//    testSearchingNodeGenerator()
-//    testUngerParsingMethod()
-    testUngerParsingMethod2()
+    testUngerParsingMethod()
+//    testUngerParsingMethod2()
     val endTime = System.currentTimeMillis()
     println(s"time used: ${endTime - startTime} ms")
   }
-
-  private def testSearchingNodeGenerator(): Unit =
-    val strList = List("aaaa", "b", "c")
-    val nodeList = UngerParser(null).generateSearchingNode(strList, 4)
-    println(nodeList)
-    var searching = nodeList(0)
-    for i <- 0 until 3 do
-      searching = searching.children(0)
-
-    assert(searching.children.isEmpty)
 
   private def testUngerParsingMethod(): Unit =
     val rule1 = ContextFreeProductionRule("S -> A + B")
