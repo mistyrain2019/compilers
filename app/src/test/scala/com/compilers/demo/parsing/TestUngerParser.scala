@@ -7,7 +7,7 @@ import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class TestUngerParser extends AnyFunSuite {
 
-  test("testing parsing") {
+  test("testing unger's parsing") {
     val startTime = System.currentTimeMillis()
 //    testUngerParsingMethod()
     testUngerParsingMethod2()
