@@ -1,6 +1,6 @@
 package com.compilers.demo.parsing
 
-import com.compilers.demo.parsing.CykAlgorithm.NonChomskyException
+import com.compilers.demo.parsing.CykAlgorithm.checkChomsky
 
 
 /**
@@ -12,8 +12,16 @@ import com.compilers.demo.parsing.CykAlgorithm.NonChomskyException
  */
 class CykAlgorithm(val cfg: ContextFreeGrammar):
 
-  checkChomsky() // throw an exception if cfg is not in Chomsky Normal Form
-  private def checkChomsky(): Unit =
+  checkChomsky(this.cfg) // throw an exception if cfg is not in Chomsky Normal Form
+
+  def accept(inputSymbols: List[String]): Boolean =
+    false
+
+object CykAlgorithm:
+
+  private class NonChomskyException(msg: String) extends RuntimeException(msg)
+
+  private def checkChomsky(cfg: ContextFreeGrammar): Unit =
 
     val rightHandSides = cfg.rules.map(_.rightHandSide)
 
@@ -35,11 +43,3 @@ class CykAlgorithm(val cfg: ContextFreeGrammar):
 
     if sizeTwoRhs.flatten.exists(GrammarUtil.isTerminal) then
       throw NonChomskyException("size 2 Rhs' containing terminals is not allowed in a Chomsky Normal Form!")
-
-
-  def accept(inputSymbols: List[String]): Boolean =
-    false
-
-object CykAlgorithm:
-
-  private class NonChomskyException(msg: String) extends RuntimeException(msg)

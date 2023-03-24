@@ -9,13 +9,13 @@ class TestCykParsingMethod extends AnyFunSuite {
 
   test("testing Chomsky Normal Form checking") {
     val startTime = System.currentTimeMillis()
-    //    testChomsky()
+//    testChomsky()
     testChomsky2()
     val endTime = System.currentTimeMillis()
     println(s"time used: ${endTime - startTime} ms")
   }
 
-  test("testing parsing") {
+  test("testing cyk parsing") {
     val startTime = System.currentTimeMillis()
     testCykAccepting()
     val endTime = System.currentTimeMillis()
@@ -51,4 +51,6 @@ class TestCykParsingMethod extends AnyFunSuite {
     val rule6 = ContextFreeProductionRule("E -> 2")
     val cfg = ContextFreeGrammar("S", List(rule1, rule2, rule3, rule4, rule5))
     val cyk = CykAlgorithm(cfg)
+    val inputSymbols: List[String] = "1 3333 2 3333 2".split(" ").toList
+    println(cyk.accept(inputSymbols))
 }
