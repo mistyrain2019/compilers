@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 
 /**
  *
- * @param cfg whose rules should not contain any '#' and '@' character
+ * @param cfg whose rules should not contain any '#' or '@' character
  */
 class UngerParser(val cfg: ContextFreeGrammar):
 
