@@ -8,6 +8,10 @@ import com.compilers.demo.parsing.UngerParser.SearchingStateNode
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
+/**
+ *
+ * @param cfg whose rules should not contain any '#' and '@' character
+ */
 class UngerParser(val cfg: ContextFreeGrammar):
 
   private val matchInProcessPatterns: mutable.Set[String] = mutable.HashSet()
