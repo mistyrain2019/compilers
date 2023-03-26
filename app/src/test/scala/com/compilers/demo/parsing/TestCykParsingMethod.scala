@@ -30,7 +30,7 @@ class TestCykParsingMethod extends AnyFunSuite {
     val rule5 = ContextFreeProductionRule("D -> 3333")
     val cfg = ContextFreeGrammar("S", List(rule1, rule2, rule3, rule4, rule5))
 
-    val cyk = CykAlgorithm(cfg) // will throw an exception
+    val cyk = CykMethod(cfg) // will throw an exception
 
   private def testChomsky2(): Unit =
     val rule1 = ContextFreeProductionRule("S -> A B")
@@ -40,7 +40,7 @@ class TestCykParsingMethod extends AnyFunSuite {
     val rule5 = ContextFreeProductionRule("D -> 3333")
     val cfg = ContextFreeGrammar("S", List(rule1, rule2, rule3, rule4, rule5))
 
-    val cyk = CykAlgorithm(cfg) // will compile
+    val cyk = CykMethod(cfg) // will compile
 
   private def testCykAccepting(): Unit =
     val rule1 = ContextFreeProductionRule("S -> A B")
@@ -52,7 +52,7 @@ class TestCykParsingMethod extends AnyFunSuite {
     val rule7 = ContextFreeProductionRule("F -> 2")
     val rule8 = ContextFreeProductionRule("F -> 4")
     val cfg = ContextFreeGrammar("S", List(rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8))
-    val cyk = CykAlgorithm(cfg)
+    val cyk = CykMethod(cfg)
     val inputSymbols: List[String] = "1 3333 2 3333 4 3333 4 3333 2".split(" ").toList
     println(cyk.accept(inputSymbols))
 }

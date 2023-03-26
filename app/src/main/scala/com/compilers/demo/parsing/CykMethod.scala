@@ -1,6 +1,6 @@
 package com.compilers.demo.parsing
 
-import com.compilers.demo.parsing.CykAlgorithm.checkChomsky
+import com.compilers.demo.parsing.CykMethod.checkChomsky
 
 import scala.collection.mutable
 
@@ -12,7 +12,7 @@ import scala.collection.mutable
  *
  * @param cfg must be Chomsky Normal Form (that is, only two kinds of rules are allow, which is S -> A B / C -> d)
  */
-class CykAlgorithm(val cfg: ContextFreeGrammar):
+class CykMethod(val cfg: ContextFreeGrammar):
 
   checkChomsky(this.cfg) // throw an exception if cfg is not in Chomsky Normal Form
 
@@ -48,7 +48,7 @@ class CykAlgorithm(val cfg: ContextFreeGrammar):
 
     r(0)(n).contains(cfg.startSymbol)
 
-object CykAlgorithm:
+object CykMethod:
 
   private class NonChomskyException(msg: String) extends RuntimeException(msg)
 
